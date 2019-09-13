@@ -1,9 +1,5 @@
-# RUNNING STAGE:
-# ~$ roscore
-# ~$ rosrun stage_ros stageros /opt/ros/melodic/share/stage_controllers/world/roomba-wander.world
-# wiki is out of date :( - for stage 3 - I have stage 4
-# error: "Model type laser not found in model typetabel"
-# update config files to port changes in versions
+# from_tensor_slices returns:
+# TypeError: Expected binary or unicode string, got [ ... (Lidar floats) ... ]
 
 import tensorflow as tf
 import numpy as np
@@ -19,12 +15,8 @@ from tensorflow.keras.layers import Input
 from tensorflow.keras.layers import InputLayer
 from tensorflow.keras.layers import Add
 
-
 #Graphing
 #import matplotlib.pyplot as plt
-
-#Tensorflow Datasets
-#import tensorflow_datasets as tfds
 
 #Logging 
 import logging
@@ -37,13 +29,13 @@ print('Data Extracted\n')
 training_data = dataset[0]
 training_labels = dataset[1]
 
-#Partition the dataset into train and test sets
+#Partition the dataset into train and test sets - TODO fix partition sizes
 indices = np.random.permutation(training_data.shape[0])
 train_idx, test_idx = indices[:80], indices[80:]
 training, test, train_labels, test_labels = training_data[train_idx,:], training_data[test_idx,:], training_labels[train_idx,:], training_labels[test_idx,:]
 print('Data Partitioned\n')
 
-#Convert to tf friendly input
+#Convert to tf friendly input - TODO fix all this shit yo
 train_dataset = tf.data.Dataset.from_tensor_slices((training, train_labels))
 test_dataset = tf.data.Dataset.from_tensor_slices((test, test_labels))
 
