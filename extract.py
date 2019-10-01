@@ -153,7 +153,6 @@ def extractMITData():
     #Extract data into lists
     mitScans = extractLidarScans(file1, 'ROBOTLASER1', 2, 1, 361, 360)
     mitTvRv = extractTvRv(file1, 'ODOM', 'ROBOTLASER1', 2, 4, 2)
-    mitTheta = extractTvRv(file1, 'ODOM', 'ROBOTLASER1', 2, 3, 1)
     mitXy = extractTvRv(file1, 'ODOM', 'ROBOTLASER1', 2, 1, 2)
     numPoints = countKeywords(file1, 'ROBOTLASER1', 2)
     
@@ -174,7 +173,6 @@ def extractCarmenData():
     #Extract data into lists
     carmenScans = extractLidarScans(file2, 'FLASER', 6, 1, 360, 360)
     carmenTvRv = extractTvRv(file2, 'ODOM', 'FLASER', 5, 4, 2)
-    carmenTheta = extractTvRv(file2, 'ODOM', 'FLASER', 5, 3, 1)
     carmenXy = extractTvRv(file2, 'ODOM', 'FLASER', 5, 1, 2)
     numPoints = countKeywords(file2, 'FLASER', 6)
 
@@ -186,6 +184,42 @@ def extractCarmenData():
     saveAllListData("extractedData/carmen/carmenTvRv.txt", carmenTvRv, numPoints)
     saveAllListData("extractedData/carmen/carmenTargets.txt", carmenTargets, numPoints)
     print('Carmen data extracted and saved') 
+
+
+def extractCarmenData2():
+    #Dataset file
+    file3 = 'rawData/fr101.carmen.log'
+
+    #Extract data into lists
+    carmen2Scans = extractLidarScans(file3, 'FLASER', 2, 1, 360, 360)
+    print(len(carmen2Scans))
+
+
+def extractBelgData():
+    #Dataset file
+    file4 = 'rawData/belgioioso.log'
+
+    #Extract data into lists
+    belgScans = extractLidarScans(file4, 'FLASER', 4, 1, 361, 360)
+    print(len(belgScans))
+
+
+def extractFr079Data():
+    #Dataset file
+    file5 = 'rawData/fr079-complete.log'
+
+    #Extract file
+    frScans = extractLidarScans(file5, 'FLASER', 2, 1, 360, 360)
+    print(len(frScans))
+
+
+def extractSeattleData():
+    #Dataset file
+    file6 = 'rawData/seattle-r.gfs.log'
+
+    #Extract file
+    seattleScans = extractLidarScans(file6, 'FLASER', 0, 1, 361, 360)
+    print(len(seattleScans))
 
 
 """
@@ -249,12 +283,24 @@ def calcTargetData(xyList):
 
         #Add to targetList
         targetList.append(targetElement)
-        if (i == 1):
-            print(targetElement)
 
     return targetList
 
 
+
+def batch(l, batch_size): 
+    ans = []
+    batch = []
+    for i in range(0, len(l), batch_size):
+        batch = []
+        for j in range(i, i+batch_size):
+            if (j < len(l)):
+                batch.append(l[j])
+            else:
+                batch.append([0]*360)
+
+        ans.append(batch)
+    return ans
 
        
 
@@ -265,25 +311,36 @@ def readExtractedData():
    
    carmenLidar = readListData('extractedData/carmen/carmenLidarScans.txt')
    carmenTvRv  = readListData('extractedData/carmen/carmenTvRv.txt')
-   carmenTargets = twoDtoOneD(readListData('extractedData/carmen/carmenTargets.txt'))
+   carmenXy = readListData('extractedData/carmen/carmenXy.txt')
+   carmenTargets = readListData('extractedData/carmen/carmenTargets.txt')
 
-   training_data = []
-   training_labels = []
-   convertToTrainingData(training_data, mitLidar, mitTargets)
-   convertToTrainingData(training_data, carmenLidar, carmenTargets)
-   training_labels = mitTvRv
-   training_labels = training_labels + carmenTvRv
-   np_training_data = numpy.array(training_data)
-   np_training_labels = numpy.array(training_labels)
+   print('lidar: ' + str(len(mitLidar)))
+   print('tvrv: ' + str(len(mitTvRv)))
+   print('targets: ' + str(len(mitTargets)))
 
-   return np_training_data, np_training_labels
+
+   print('lidar: ' + str(len(carmenLidar)))
+   print('tvrv: ' + str(len(carmenTvRv)))
+   print('xY: ' + str(len(carmenXy)))
+   print('targets: ' + str(len(carmenTargets)))
+   batch_size = 32
+
+   lidarTrain = numpy.array(mitLidar + carmenLidar)
+   print(lidarTrain[0])
+   targetTrain = numpy.array(mitTargets + carmenTargets)
+
+   velocityLabels = numpy.array(mitTvRv + carmenTvRv)
+
+   
+
+   return lidarTrain, targetTrain, velocityLabels
 
 
 
 #readExtractedData()
 #extractAll()
-#extractCarmenData()
 #extractMITData()
+
 
 #np_mitScans = numpy.array(mitScans)
 #np_mitOdom = numpy.array(mitOdom)
