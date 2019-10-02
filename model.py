@@ -49,13 +49,25 @@ lidarTrain, lidarTest, targetTrain, targetTest = train_test_split(
        training_lidar, training_targets, test_size=0.25, random_state=42)
 
 
+#Expand dimensionality of input data
+a = 1
+lidarTrain = np.expand_dims(lidarTrain, axis=a)
+lidarTest = np.expand_dims(lidarTest, axis=a)
+targetTrain = np.expand_dims(targetTrain, axis=a)
+targetTest = np.expand_dims(targetTest, axis=a)
+
 print('Lidar Shape: ', lidarTrain.shape)
 print('Target Shape: ', targetTrain.shape)
-
 
 split = int(numSamples*0.75)
 trainLabels = training_labels[:split]
 testLabels = training_labels[split:]
+
+#Print data lengths (testing) 
+print('lidarTrain', len(lidarTrain))
+print('lidarTest', len(lidarTest))
+print('targetTrain', len(targetTrain))
+print('targetTest', len(targetTest))
 
 
 print('Data pulled, batched, and preprocessed')
@@ -107,11 +119,12 @@ def createModel():
     filter_size = 64
 
     #Create First Block
-    X_input = Input(shape=(lidarTrain.shape))
+    X_input = Input(shape=(1,359))
     #X = Flatten()(X_input)
-    X = Conv1D(filter_size, (7), 3, padding='same', activation=tf.nn.relu)(X_input)
+    X = Conv1D(filter_size, (7), 3, padding='same', activation=tf.nn.relu,
+            input_shape=(lidarTrain.shape))(X_input)
     X = BatchNormalization()(X)
-    X = MaxPooling1D((3), 1)(X)
+    X = MaxPooling1D((3), 1, padding='same')(X)
 
     #**************CNN RESIDUAL*****************
     #Save input Tensor
@@ -147,19 +160,19 @@ def createModel():
     X = Activation('relu')(X)
     
     #Add last pooling layer
-    X = AveragePooling1D((3), 1)(X)
-    X = Flatten()(X)
+    X = AveragePooling1D((3), 1, padding='same')(X)
+    #X = Flatten()(X)
     X = Model(inputs=X_input, outputs=X)
     #*************END CNN************    
 
     #Add a secondary input to hidden layer for target info
-    Y_in = Input(shape=(numSamples,2))
-    Y = Flatten()(Y_in)
-    Y = Lambda(lambda x: x)(Y)
+    Y_in = Input(shape=(1,2))
+    #Y = Flatten()(Y_in)
+    Y = Lambda(lambda x: x)(Y_in)
     Y = Model(inputs=Y_in, outputs=Y) 
     
     #Combine new input with output of CNN
-    combined = concatenate([X.output, Y.output], axis=1)
+    combined = concatenate([X.output, Y.output], axis=2) #prev: 1
 
     #Add Fully Connected Layers
     Y = Dense(256, activation=tf.nn.relu)(combined)
