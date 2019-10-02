@@ -59,6 +59,7 @@ targetTest = np.expand_dims(targetTest, axis=a)
 print('Lidar Shape: ', lidarTrain.shape)
 print('Target Shape: ', targetTrain.shape)
 
+#TODO label size does not match input data size - change methods here 
 split = int(numSamples*0.75)
 trainLabels = training_labels[:split]
 testLabels = training_labels[split:]
@@ -68,6 +69,8 @@ print('lidarTrain', len(lidarTrain))
 print('lidarTest', len(lidarTest))
 print('targetTrain', len(targetTrain))
 print('targetTest', len(targetTest))
+print('trainLabels', len(trainLabels))
+print('testLabels', len(testLabels))
 
 
 print('Data pulled, batched, and preprocessed')
