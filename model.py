@@ -20,6 +20,7 @@ from tensorflow.keras.models import Model
 from tensorflow.keras.layers import concatenate
 from tensorflow.keras.layers import Lambda
 from tensorflow.keras.layers import Flatten
+from tensorflow.keras.layers import Reshape
 from sklearn.model_selection import train_test_split
 
 #Graphing
@@ -52,20 +53,10 @@ print('Lidar Shape: ', lidarTrain.shape)
 print('Target Shape: ', targetTrain.shape)
 
 
-
 split = int(numSamples*0.75)
 trainLabels = training_labels[:split]
 testLabels = training_labels[split:]
 
-print('Data Partitioned\n')
-
-#
-np.array(extract.batch(lidarTrain, batch_size))
-np.array(extract.batch(lidarTest, batch_size))
-np.array(extract.batch(targetTrain, batch_size))
-np.array(extract.batch(targetTest, batch_size))
-np.array(extract.batch(trainLabels, batch_size))
-np.array(extract.batch(testLabels, batch_size))
 
 print('Data pulled, batched, and preprocessed')
 
@@ -110,22 +101,13 @@ def createResBlocks(X, filter_size):
 
     return X
 
-def createFCLayers(X, n):
-    """ Creates the fully connected layers of the model
-        X - input tensor
-        n - number of neurons per layer
-    """
-    for i in range(3): 
-        X = Dense(n, activation=tf.nn.relu)(X)
-    
-    return X
 
 
 def createModel():
     filter_size = 64
 
     #Create First Block
-    X_input = Input(shape=(None,360))
+    X_input = Input(shape=(lidarTrain.shape))
     #X = Flatten()(X_input)
     X = Conv1D(filter_size, (7), 3, padding='same', activation=tf.nn.relu)(X_input)
     X = BatchNormalization()(X)
@@ -171,7 +153,7 @@ def createModel():
     #*************END CNN************    
 
     #Add a secondary input to hidden layer for target info
-    Y_in = Input(shape=(2,1))
+    Y_in = Input(shape=(numSamples,2))
     Y = Flatten()(Y_in)
     Y = Lambda(lambda x: x)(Y)
     Y = Model(inputs=Y_in, outputs=Y) 
@@ -197,7 +179,7 @@ model.compile(loss='mean_squared_error', optimizer=tf.keras.optimizers.Adam(0.1)
 print('Initiating Training...')
 #Train Model
 history = model.fit([lidarTrain, targetTrain], trainLabels, 
-        validation_data=([lidarTest, targetTest], testLabels), epochs=5, batch_size=32)
+        validation_data=([lidarTest, targetTest], testLabels), epochs=5, batch_size=numSamples)
 
 print('Training Completed.')
 #Batch data affects epochs here
