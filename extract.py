@@ -192,7 +192,18 @@ def extractCarmenData2():
 
     #Extract data into lists
     carmen2Scans = extractLidarScans(file3, 'FLASER', 2, 1, 360, 360)
-    print(len(carmen2Scans))
+    carmen2TvRv = extractTvRv(file3, 'ODOM', 'FLASER', 2, 4, 2)
+    carmenXy = extractTvRv(file3, 'ODOM', 'FLASER', 2, 1, 2)
+    numPoints = countKeywords(file3, 'FLASER', 2)
+    
+    #Calc Target Data
+    carmen2Targets = calcTargetData(carmenXy)
+
+    #Save lists in different files
+    saveAllListData("extractedData/carmen2/carmen2LidarScans.txt", carmen2Scans, numPoints)
+    saveAllListData("extractedData/carmen2/carmen2TvRv.txt", carmenTvRv, numPoints)
+    saveAllListData("extractedData/carmen2/carmenTargets.txt", carmenTargets, numPoints)
+    print('Carmen2 data extracted and saved')
 
 
 def extractBelgData():
@@ -201,7 +212,17 @@ def extractBelgData():
 
     #Extract data into lists
     belgScans = extractLidarScans(file4, 'FLASER', 4, 1, 361, 360)
-    print(len(belgScans))
+    belgTvRv = extractTvRv(file4, 'ODOM', 'FLASER', 4, 4, 2)
+    belgXy = extractTvRv(file4, 'ODOM', 'FLASER', 4, 1, 2)
+    numPoints = countKeywords(file4, 'FLASER', 4)
+
+    #Calc Target Data
+    belgTargets = calcTargetData(belgXy)
+
+    saveAllListData("extractedData/belg/belgLidarScans.txt", belgScans, numPoints)
+    saveAllListData("extractedData/belg/belgTvRv.txt", belgTvRv, numPoints)
+    saveAllListData("extractedData/belg/belgTargets.txt", belgTargets, numPoints)
+    print('Belg data extracted and saved')
 
 
 def extractFr079Data():
@@ -318,20 +339,15 @@ def readExtractedData():
    print('tvrv: ' + str(len(mitTvRv)))
    print('targets: ' + str(len(mitTargets)))
 
-
    print('lidar: ' + str(len(carmenLidar)))
    print('tvrv: ' + str(len(carmenTvRv)))
    print('xY: ' + str(len(carmenXy)))
    print('targets: ' + str(len(carmenTargets)))
-   batch_size = 32
 
    lidarTrain = numpy.array(mitLidar + carmenLidar)
-   print(lidarTrain[0])
    targetTrain = numpy.array(mitTargets + carmenTargets)
-
    velocityLabels = numpy.array(mitTvRv + carmenTvRv)
 
-   
 
    return lidarTrain, targetTrain, velocityLabels
 
