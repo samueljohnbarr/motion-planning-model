@@ -59,10 +59,16 @@ targetTest = np.expand_dims(targetTest, axis=a)
 print('Lidar Shape: ', lidarTrain.shape)
 print('Target Shape: ', targetTrain.shape)
 
-#TODO label size does not match input data size - change methods here 
-split = int(numSamples*0.75)
+#Split and format labeled data
+split = int(math.floor(numSamples*0.75)) - 1
+print('numSamples:', numSamples)
+print('split:', split)
 trainLabels = training_labels[:split]
 testLabels = training_labels[split:]
+
+trainLabels = np.expand_dims(trainLabels, axis=a)
+testLabels = np.expand_dims(testLabels, axis=a)
+
 
 #Print data lengths (testing) 
 print('lidarTrain', len(lidarTrain))
@@ -71,7 +77,6 @@ print('targetTrain', len(targetTrain))
 print('targetTest', len(targetTest))
 print('trainLabels', len(trainLabels))
 print('testLabels', len(testLabels))
-
 
 print('Data pulled, batched, and preprocessed')
 
@@ -180,7 +185,8 @@ def createModel():
     #Add Fully Connected Layers
     Y = Dense(256, activation=tf.nn.relu)(combined)
     Y = Dense(256, activation=tf.nn.relu)(Y)
-    Y = Dense(256, activation=tf.nn.relu)(Y)
+    Y = Dense(256)(Y)
+    Y = Dense(2)(Y)
 
     model = Model(inputs=[X_input, Y_in], outputs=Y)
 
