@@ -1,6 +1,6 @@
-import scraper.py
-import data-io.py
-import format-data.py
+import scraper
+import io
+import dataFormat
 
 datasetDir = './rawData/'
 """ 
@@ -28,17 +28,31 @@ datasets = [
 #TODO the last two have dummy values for ODOM info
           
 """
-   
+   Scrapes data from datasets lists if the dataset is marked
+   for scraping.
+   Saves scraped data into its own directory.
 """
 def scrapeData():
     for dset in datasets:
         #Check if dataset is marked for scraping
         if dset[-1]:
-            fname, lkeywrd, lomit, lnAfter, okeywrd, oomit, xynAfter, vnAfter = dset[:-1]
+            #Grab components of tuple
+            fname, lkeywrd, lomit, lnAfter, okeywrd, oomit, xynAfter, \
+                    vnAfter = dset[:-1]
+            #Scrape data
+            scans, tvRv, xY, numPoints = 
+                scraper.scrapeFile(fname, lkeywrd, lomit, lnAfter, \
+                        okeywrd, oomit, xynAfter, vnAfter)
+            #Calculate target vector
+            targets = dataFormat.calcTargetData(xY)
+
+            #Save Extracted Data
+            setName = fname[:6]
+            saveExtractedSet(setName, scans, targets, tvRv, numPoints)
+
 
 
 scrapeData()
 print(':)')
 
-            
-
+        
