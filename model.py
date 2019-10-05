@@ -1,6 +1,3 @@
-# from_tensor_slices returns:
-# TypeError: Expected binary or unicode string, got [ ... (Lidar floats) ... ]
-
 import tensorflow as tf
 import tensorflow.keras.backend as K
 import numpy as np
