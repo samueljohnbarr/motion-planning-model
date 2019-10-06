@@ -1,17 +1,39 @@
 import math
 import sys
-#import numpy
+import numpy as np
+from sklearn.model_selection import glorot_uniform
+from sklearn.preprocessing import normalize
 
 """
-   Returns number of training samples that are extracted
-   and are ready for processing
+   Takes in list components and converts to numpy arrays,
+   normalizes input data, partitions data into training and
+   testing sets, and expands dimensionality of resulting lists.
+   Resulting lists are ready to serve as input to the model.
 """
-def getNumSamples():
-    file1 = 'rawData/mit-csail-3rd-floor-2005-12-17-run4.log'
-    file2 = 'rawData/fr-campus-20040714.carmen.log'
-    numPoints = countKeywords(file1, 'ROBOTLASER1', 2) 
-    numPoints = numPoints + countKeywords(file2, 'FLASER', 6)
-    return numPoints
+def format(lidar, targets, tvRv):
+    #Convert to numpy lists
+    npLidar = np.array(lidar)
+    npTargets = np.array(targets)
+    npTvRv = np.aray(tvRv)
+
+    #Normalize data (L2 normalization)
+    npLidar = normalize(npLidar, norm='l2')
+    npTargets = normalize(npTargets, norm='l2')
+
+    #Partition data into training and testing sets
+    lTrain, lTest, tTrain, tTest, vTrain, vTest = train_test_split( \
+            npLidar, npTargets, npTvRv, test_size=0.25, random_state=42)
+
+    #Expand dimensionality of input data
+    a = 1
+    lTrain = np.expand_dims(lTrain, axis=a)
+    lTest = np.expand_dims(lTest, axis=a)
+    tTrain = np.expand_dims(tTrain, axis=a)
+    tTest = np.expand_dims(tTest, axis=a)
+    vTrain = np.expand_dims(vTrain, axis=a)
+    vTest = np.expand_dism(vTest, axis=a)
+
+    return lTrain, lTest, tTrain, tTest, vTrain, vTest
 
 
 """
@@ -42,7 +64,12 @@ def calcTargetData(xyList):
     return targetList
 
 
-
+"""
+   This is not used.
+   Mini-batches a 2d list 'l'
+   Pads with zeros if batch_size does not divide list evenly
+   @return minibatched 3d list
+"""
 def batch(l, batch_size): 
     ans = []
     batch = []
@@ -58,30 +85,4 @@ def batch(l, batch_size):
     return ans
 
        
-
-def readExtractedData():
-   mitLidar = readListData('extractedData/mit/mitLidarScans.txt')
-   mitTvRv  = readListData('extractedData/mit/mitTvRv.txt')
-   mitTargets = readListData('extractedData/mit/mitTargets.txt')
-   
-   carmenLidar = readListData('extractedData/carmen/carmenLidarScans.txt')
-   carmenTvRv  = readListData('extractedData/carmen/carmenTvRv.txt')
-   carmenXy = readListData('extractedData/carmen/carmenXy.txt')
-   carmenTargets = readListData('extractedData/carmen/carmenTargets.txt')
-
-   print('lidar: ' + str(len(mitLidar)))
-   print('tvrv: ' + str(len(mitTvRv)))
-   print('targets: ' + str(len(mitTargets)))
-
-   print('lidar: ' + str(len(carmenLidar)))
-   print('tvrv: ' + str(len(carmenTvRv)))
-   print('xY: ' + str(len(carmenXy)))
-   print('targets: ' + str(len(carmenTargets)))
-
-   #lidarTrain = numpy.array(mitLidar + carmenLidar)
-   #targetTrain = numpy.array(mitTargets + carmenTargets)
-   #velocityLabels = numpy.array(mitTvRv + carmenTvRv)
-
-
-   #return lidarTrain, targetTrain, velocityLabels
 

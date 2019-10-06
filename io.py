@@ -22,19 +22,22 @@ def saveListData(fileName, listData, numPoints):
 
 
 """
-   Reads in data from an already extracted file
+   Reads in data from a single extracted file
    Returns a 2d list of extracted data
+   @param fileName - should include full path
+   @return 2d list of data
 """
-def readListData(fileName):
+def readFileData(fileName):
     readList = []
+    sampleDelimiter = '\n'
     f = open(fileName, "r")
     dataPoint = []
     for line in f:
-        if(line == '\n'):
+        if(line == sampleDelimeter):
             readList.append(dataPoint)
             dataPoint = []
         else:
-            dataPoint.append(float(line.strip('\n')))
+            dataPoint.append(float(line.strip(sampleDelimiter)))
     f.close()
     return readList
 
@@ -80,7 +83,7 @@ def readExtractedData():
             setName = dirpath.split('/')[-1]
             #Grab the type of data in the file
             ltype = fname.split(setName)[1].split('.txt')[0]
-            data = readListData(dirpath + '/' + fname)
+            data = readFileData(dirpath + '/' + fname)
             if ltype == 'LidarScans':
                 lidar += data
                 numPoints += len(data)

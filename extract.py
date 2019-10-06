@@ -50,9 +50,19 @@ def scrapeData():
             setName = fname[:6]
             saveExtractedSet(setName, scans, targets, tvRv, numPoints)
 
+"""
+   Reads extracted data and formats it for input to the model
+   @return train/test sets of lidar data, target data, 
+   velocity (labeled) data and number of samples
+"""
+def getData():
+    #Grab data from extracted files
+    lidar, targets, tvRv, numSamples = readExtractedData()
+    
+    #Format data
+    lTrain, lTest, tTrain, tTest, vTrain, vTest = dataFormat.format( \
+            lidar, targets, tvRv)
+
+    return lTrain, lTest, tTrain, tTest, vTrain, vTest, numSamples
 
 
-scrapeData()
-print(':)')
-
-        
