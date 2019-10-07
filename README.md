@@ -15,7 +15,7 @@ Examples:
 ```
 
 ### Description
-The idea of the model is to think like a human would - Given what you can see of your surroundings and an idea of where you want to go, drive in that direction without hitting anything.  This is done using *keras*, an machine learning API built on Google's *Tensorflow* framework. The implemented model is a residual convolutional neural network (CNN) where the input is a length 360 distance vector (LiDAR output).  The distance vector is sent through the CNN and its output is then fused with target information.  The fused data is then sent through the fully connected layers and the final output is translational and rotational velocities meant to drive the robot. 
+The idea of the model is to think like a human would - Given what you can see of your surroundings and an idea of where you want to go, drive in that direction without hitting anything.  This implementation uses *keras*, a machine learning API built on Google's *Tensorflow* framework. The implemented model is a residual convolutional neural network (CNN) where the input is a length 360 distance vector (LiDAR output).  The distance vector is sent through the CNN and its output is then fused with target information.  The fused data is then sent through the fully connected layers and the final output is translational and rotational velocities meant to drive the robot. 
 
 Upon training, the loss (the difference between the model output velocities and the actual velocities) is calculated using mean-squared-error.  The optimization function (how the model uses loss to alter its learned weights) is the Adam optimizer.
 
