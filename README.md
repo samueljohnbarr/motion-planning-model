@@ -1,6 +1,6 @@
 # motion-planning-model
 This is my graduate project for Appalachian State University and is an implementation of Phieffer et al's *From Perception to Decision: A Data Driven Approach to Autonomous Ground Robots*.
-The goal of my implementation is to train a model to drive a robot through indoor evironments given that the robot is equiped with a LiDAR.
+The goal of my implementation is to train a model to drive a LiDAR-equipped robot through indoor evironments.
 
 ## model.py 
 ### Usage
