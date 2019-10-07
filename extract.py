@@ -32,23 +32,30 @@ datasets = [
    for scraping.
    Saves scraped data into its own directory.
 """
-def scrapeData():
+def scrapeData(verbosity):
     for dset in datasets:
         #Check if dataset is marked for scraping
         if dset[-1]:
+            if (verbosity): print('Scraping', dset[0])
             #Grab components of tuple
             fname, lkeywrd, lomit, lnAfter, okeywrd, oomit, xynAfter, \
                     vnAfter = dset[:-1]
             #Scrape data
-            scans, tvRv, xY, numPoints = 
-                scraper.scrapeFile(fname, lkeywrd, lomit, lnAfter, \
+            fname = datasetDir + fname
+            scans, tvRv, xY, numPoints = scraper.scrapeFile(fname, lkeywrd, lomit, lnAfter, \
                         okeywrd, oomit, xynAfter, vnAfter)
+            if (verbosity): print('Data components extracted')
+
             #Calculate target vector
             targets = dataFormat.calcTargetData(xY)
+            if (verbosity): print('Target calculation completed')
 
             #Save Extracted Data
             setName = fname[:6]
             saveExtractedSet(setName, scans, targets, tvRv, numPoints)
+            if (verbosity): 
+                print('Extracted data saved in extractedData/'+setName)
+                print('Done.')
 
 """
    Reads extracted data and formats it for input to the model
@@ -66,3 +73,5 @@ def getData():
     return lTrain, lTest, tTrain, tTest, vTrain, vTest, numSamples
 
 
+
+scrapeData(True)

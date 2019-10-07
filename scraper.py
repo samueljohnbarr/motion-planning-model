@@ -1,5 +1,7 @@
 import math
 
+
+
 """
    Takes in a list of strings and converts to list of floats
    @param string list to convert

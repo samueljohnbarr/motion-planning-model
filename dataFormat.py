@@ -1,7 +1,8 @@
 import math
 import sys
 import numpy as np
-from sklearn.model_selection import glorot_uniform
+from tensorflow.keras.initializers import glorot_uniform
+from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import normalize
 
 """
