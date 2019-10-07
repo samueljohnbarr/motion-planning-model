@@ -36,38 +36,6 @@ TRAIN = False
 batch_size = 32
 
 
-def getData():
-    """
-       Grabs extracted data and prepares it for input to the model
-    """
-    #Grab the dataset
-    training_lidar, training_targets, training_labels = extract.readExtractedData()
-    numSamples = extract.getNumSamples()
-    if VERBOSE: print('Number of training samples:', numSamples)
-
-    #Normalize input data
-    training_lidar = normalize(training_lidar, norm='l2')
-    training_targets = normalize(training_targets, norm='l2')
-
-    #Partition data into training and testing sets
-    lidarTrain, lidarTest, targetTrain, targetTest, labelTrain, labelTest = train_test_split(training_lidar, training_targets, training_labels, test_size=0.25, random_state=42)
-
-    #Expand dimensionality of input data
-    a = 1
-    lidarTrain = np.expand_dims(lidarTrain, axis=a)
-    lidarTest = np.expand_dims(lidarTest, axis=a)
-    targetTrain = np.expand_dims(targetTrain, axis=a)
-    targetTest = np.expand_dims(targetTest, axis=a)
-    labelTrain = np.expand_dims(labelTrain, axis=a)
-    labelTest = np.expand_dims(labelTest, axis=a)
-
-    if VERBOSE: print('Training input shape:', lidarTrain.shape)
-    if VERBOSE: print('Testing input shape:', lidarTest.shape)
-
-    return lidarTrain, lidarTest, targetTrain, targetTest, labelTrain, labelTest
-
-
-
 def createResBlocks(X, filter_size):
     """ Creates the residual part of the model (like 80% of the entire model)
         Including all skip connections
@@ -186,7 +154,8 @@ if VERBOSE: print('Compiling Model...')
 model.compile(loss='mean_squared_error', optimizer=tf.keras.optimizers.Adam(0.1))
 
 if VERBOSE: print('Preparing Input Data...')
-lidarTrain, lidarTest, targetTrain, targetTest, labelTrain, labelTest = getData()
+lidarTrain, lidarTest, targetTrain, targetTest, labelTrain, labelTest, \
+        numSamples = extract.getData()
 
 if (TRAIN):
     if VERBOSE: print('Initiating Training...')

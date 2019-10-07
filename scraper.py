@@ -60,8 +60,10 @@ def scrapeLidarScans(fileName, keyword, numOmit, numAfter):
         cut = strFile[j:]
         #Cut proceeding data up to laser measurements
         startIndex = j+numAfter #cut.find(str(numPoints))
-        #TODO test this
-        strValues = cut[startIndex:].split(' ', numPoints+numAfter)[numAfter:numPoints]
+        #TODO this overshoots for some reason
+        strValues = cut[startIndex:].split(' ', numPoints+numAfter)[:numPoints]
+        print(strValues[0], '|', strValues[-1])
+        exit(0)
         #Convert data to float
         final = floatify(strValues, True)
         scanSet.append(final)
