@@ -6,12 +6,12 @@ The goal of my implementation is to train a model to drive a LiDAR-equipped robo
 ### Usage
 Since I am currently in the training phase of development, functionality is limited to just that.
 ```
-model.py <verbosity> <function>
+python3 model.py <verbosity> <function>
     <verbosity>: -v
     <function>: train | reset
 Examples:
-    model.py -v train
-    model.py reset
+    python3 model.py -v train
+    python3 model.py reset
 ```
 
 ### Description
