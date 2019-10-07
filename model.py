@@ -82,7 +82,7 @@ def createModel():
     filter_size = 64
     #**** Convolutional Network ****#
     #Create First Block
-    X_input = Input(shape=(1,359))
+    X_input = Input(shape=(1,360))
     X = Conv1D(filter_size, (7), 3, padding='same', activation=tf.nn.relu)(X_input)
     X = BatchNormalization()(X)
     X = MaxPooling1D((3), 1, padding='same')(X)
@@ -139,7 +139,9 @@ if len(sys.argv) > 1:
         elif (i == 'reset'):
             resetModel()
         elif (i == 'train'):
-            TRAIN = True            
+            TRAIN = True
+        elif (i == 'eval'):
+            pass
 else:
     print('USAGE: python3 model.py <verbosity> <function>')
     print('Verbose mode: -v')
@@ -151,7 +153,7 @@ if VERBOSE: print('Preparing Model & Data...')
 model = createModel()
 
 if VERBOSE: print('Compiling Model...')
-model.compile(loss='mean_squared_error', optimizer=tf.keras.optimizers.Adam(0.1))
+model.compile(loss='mean_squared_error', optimizer=tf.keras.optimizers.Adam(0.1), metrics=['accuracy'])
 
 if VERBOSE: print('Preparing Input Data...')
 lidarTrain, lidarTest, targetTrain, targetTest, labelTrain, labelTest, \
@@ -159,9 +161,11 @@ lidarTrain, lidarTest, targetTrain, targetTest, labelTrain, labelTest, \
 
 if (TRAIN):
     if VERBOSE: print('Initiating Training...')
-    history = model.fit([lidarTrain, targetTrain], trainLabels, 
-        validation_data=([lidarTest, targetTest], testLabels), epochs=5, batch_size=numSamples)
+    history = model.fit([lidarTrain, targetTrain], labelTrain, 
+        validation_data=([lidarTest, targetTest], labelTest), epochs=5, batch_size=numSamples)
     if VERBOSE: print('Training Completed.')
 
 #Evaluate Accuracy
+metrics = model.evaluate([lidarTest, targetTest], labelTest)
+print(metrics)
 

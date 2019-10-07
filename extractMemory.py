@@ -16,7 +16,6 @@ def saveListData(fileName, listData, numPoints):
         for j in listData[i]:
             f.write("%f\n" % j)
         f.write("\n")
-        print('Point', count, 'saved')
         count = count + 1
     f.close()
 
@@ -33,7 +32,7 @@ def readFileData(fileName):
     f = open(fileName, "r")
     dataPoint = []
     for line in f:
-        if(line == sampleDelimeter):
+        if(line == sampleDelimiter):
             readList.append(dataPoint)
             dataPoint = []
         else:
@@ -60,6 +59,13 @@ def saveExtractedSet(setName, scans, targets, tvRv, numPoints):
     if not os.path.exists(filePath):
         os.mkdir(filePath)
     filePath += '/' + setName
+
+    if numPoints > len(tvRv):
+        print('*WARNING: Number of lidar scans & number of odometer readings differ.')
+        print('          LidarScanLength:', numPoints, '| OdomScanLength: ', len(tvRv))
+        print('          Verify parameters are correct.  Truncating lengths...')
+        numPoints = len(tvRv)
+     
     #Save Lists into respective files
     saveListData(filePath + 'LidarScans.txt', scans, numPoints)
     saveListData(filePath + 'Targets.txt', targets, numPoints)

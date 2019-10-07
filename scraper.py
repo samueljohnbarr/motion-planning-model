@@ -1,7 +1,6 @@
 import math
 
 
-
 """
    Takes in a list of strings and converts to list of floats
    @param string list to convert
@@ -43,9 +42,12 @@ def countKeywords(fileName, keyword, numOmit):
    @param numPoints how many lidar distance points there are
    @param numPointsCollect how many lidar distance points to collect
 """
-def scrapeLidarScans(fileName, keyword, numOmit, numAfter):
+def scrapeLidarScans(fileName, laserkeyword, odomkeyword, numOmit, numAfter):
     scanSet = []
     numPoints = 360
+    #Compensate for the keyword itself
+    numAfter = numAfter+1
+    rightBound = numPoints + numAfter
     #Open file and turn into string
     with open(fileName, 'r') as file:
         strFile = file.read()
@@ -53,22 +55,16 @@ def scrapeLidarScans(fileName, keyword, numOmit, numAfter):
     count = 1
     #Skip over omitted instances of keyword
     for i in range(numOmit+1):
-        j = strFile.find(keyword, j+1)
+        j = strFile.find(laserkeyword, j+1)
     #Loop while there are more keywords
     while (j != -1):
-        #Cut keyword and preceeding data
-        cut = strFile[j:]
-        #Cut proceeding data up to laser measurements
-        startIndex = j+numAfter #cut.find(str(numPoints))
-        #TODO this overshoots for some reason
-        strValues = cut[startIndex:].split(' ', numPoints+numAfter)[:numPoints]
-        print(strValues[0], '|', strValues[-1])
-        exit(0)
+        #Cut out string lidar measurements
+        strValues = strFile[j:].split(' ', rightBound)[numAfter:rightBound]
+
         #Convert data to float
         final = floatify(strValues, True)
         scanSet.append(final)
-        j = strFile.find(keyword, j+1)
-        print('Point #', count, '...', 'KeywordPos:', j)
+        j = strFile.find(laserkeyword, strFile.find(odomkeyword, j+1))
         count = count + 1
     return scanSet
 
@@ -81,8 +77,11 @@ def scrapeLidarScans(fileName, keyword, numOmit, numAfter):
    @param numPoints number of values to grab at each datapoint
 """
 def scrapeOdom(fileName, odomkeyword, laserkeyword, numOmit, numAfter):
-    tvRvSet = []
+    odomSet = []
     numPoints = 2
+    #Compensate for keyword itself
+    numAfter = numAfter + 1
+    rightBound = numAfter + numPoints
     #Open file and turn into string
     with open(fileName, 'r') as file:
         strFile = file.read()
@@ -92,27 +91,30 @@ def scrapeOdom(fileName, odomkeyword, laserkeyword, numOmit, numAfter):
     for i in range(numOmit+1):
         j = strFile.find(odomkeyword, j+1)
     #Loop while there are more keywords
-    rightBound = numAfter + numPoints
     while (j != -1):
         #Cut keyword and preceeding data
         strValues = strFile[j:].split(' ', rightBound)[numAfter:rightBound]
-        print(strValues)
+
         final = floatify(strValues, False)
-        tvRvSet.append(final)
+        odomSet.append(final)
         j = strFile.find(odomkeyword, strFile.find(laserkeyword, j+1))
-        print('Point #', count, '...', 'KeywordPos:', j)
-        count = count+1
-    return tvRvSet
+        count = count + 1
+
+    return odomSet
          
 
 """
    Extracts all necessary information using the functions above
 """
-def scrapeFile(fileName, lidarKeyword, lidarOmit, lidarNumAfter, odomKeyword, odomOmit, xYNumAfter, tvRvNumAfter):
+def scrapeFile(fileName, lidarKeyword, lidarOmit, lidarNumAfter, odomKeyword, odomOmit, xYNumAfter, tvRvNumAfter, verbose):
     #Extract data into lists
-    scans = scrapeLidarScans(fileName, lidarKeyword, lidarOmit, lidarNumAfter)
-    xY = scrapeOdom(fileName, odomKeyword, lidarKeyword, odomOmit, xYNumAfter) 
+    scans = scrapeLidarScans(fileName, lidarKeyword, odomKeyword, lidarOmit, lidarNumAfter)
+    if (verbose): print('Lidar Scans scraped. | Scraping x & y positions...')
+    xY = scrapeOdom(fileName, odomKeyword, lidarKeyword, odomOmit, xYNumAfter)
+    if (verbose): print('x & y positions scraped. | Scraping velocities...')
     tvRv = scrapeOdom(fileName, odomKeyword, lidarKeyword, odomOmit, tvRvNumAfter)
+    if (verbose):print('velocities scraped.')
+
     numPoints = countKeywords(fileName, lidarKeyword, lidarOmit)
 
     return scans, tvRv, xY, numPoints

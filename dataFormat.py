@@ -15,7 +15,7 @@ def format(lidar, targets, tvRv):
     #Convert to numpy lists
     npLidar = np.array(lidar)
     npTargets = np.array(targets)
-    npTvRv = np.aray(tvRv)
+    npTvRv = np.array(tvRv)
 
     #Normalize data (L2 normalization)
     npLidar = normalize(npLidar, norm='l2')
@@ -32,7 +32,7 @@ def format(lidar, targets, tvRv):
     tTrain = np.expand_dims(tTrain, axis=a)
     tTest = np.expand_dims(tTest, axis=a)
     vTrain = np.expand_dims(vTrain, axis=a)
-    vTest = np.expand_dism(vTest, axis=a)
+    vTest = np.expand_dims(vTest, axis=a)
 
     return lTrain, lTest, tTrain, tTest, vTrain, vTest
 

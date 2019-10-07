@@ -1,5 +1,5 @@
 import scraper
-import io
+import extractMemory
 import dataFormat
 
 datasetDir = './rawData/'
@@ -17,43 +17,44 @@ datasetDir = './rawData/'
 """
 
 datasets = [ 
-('mit-csail-3rd-floor-2005-12-17-run4.log', 'ROBOTLASER1', 2, 1, 'ODOM', 2, 1, 4, True),
-('fr-campus-20040714.carmen.log', 'FLASER', 6, 1, 'ODOM', 5, 1, 4, False),
-
-('fr101.carmen.log', 'FLASER', 2, 1, 'ODOM', 2, 1, 4, False),
-('belgioioso.log', 'FLASER', 4, 1, 'ODOM', 4, 1, 4, False),
-('fr079-complete.log', 'FLASER', 2, 1, 'ODOM', 2, 1, 4, False),
-('seattle-r.gfs.log', 'FLASER', 0, 1, 'ODOM', 2, 1, 4, False)
+('mit-csail-3rd-floor-2005-12-17-run4.log', 'ROBOTLASER1', 2, 8, 'ODOM', 2, 0, 3, True),
+('fr-campus-20040714.carmen.log', 'FLASER', 6, 2, 'ODOM', 5, 0, 3, True),
+('fr101.carmen.log', 'FLASER', 2, 1, 'ODOM', 2, 0, 3, True),
+('belgioioso.log', 'FLASER', 4, 1, 'ODOM', 6, 0, 3, True),
+('fr079-complete.log', 'FLASER', 2, 1, 'ODOM', 5, 0, 3, True),
+('seattle-r.gfs.log', 'FLASER', 0, 1, 'ODOM', 71, 0, 3, False) 
 ]
-#TODO the last two have dummy values for ODOM info
           
 """
    Scrapes data from datasets lists if the dataset is marked
    for scraping.
    Saves scraped data into its own directory.
 """
-def scrapeData(verbosity):
+def scrapeData(verbose):
     for dset in datasets:
         #Check if dataset is marked for scraping
         if dset[-1]:
-            if (verbosity): print('Scraping', dset[0])
+            if (verbose): 
+                print('Scraping', dset[0])
+                print('This may take a while...')
+
             #Grab components of tuple
             fname, lkeywrd, lomit, lnAfter, okeywrd, oomit, xynAfter, \
                     vnAfter = dset[:-1]
             #Scrape data
-            fname = datasetDir + fname
-            scans, tvRv, xY, numPoints = scraper.scrapeFile(fname, lkeywrd, lomit, lnAfter, \
-                        okeywrd, oomit, xynAfter, vnAfter)
-            if (verbosity): print('Data components extracted')
+            path = datasetDir + fname
+            scans, tvRv, xY, numPoints = scraper.scrapeFile(path, lkeywrd, lomit, lnAfter, \
+                        okeywrd, oomit, xynAfter, vnAfter, verbose)
+            if (verbose): print('Data components extracted')
 
             #Calculate target vector
             targets = dataFormat.calcTargetData(xY)
-            if (verbosity): print('Target calculation completed')
+            if (verbose): print('Target calculation completed')
 
             #Save Extracted Data
             setName = fname[:6]
-            saveExtractedSet(setName, scans, targets, tvRv, numPoints)
-            if (verbosity): 
+            extractMemory.saveExtractedSet(setName, scans, targets, tvRv, numPoints)
+            if (verbose): 
                 print('Extracted data saved in extractedData/'+setName)
                 print('Done.')
 
@@ -64,7 +65,7 @@ def scrapeData(verbosity):
 """
 def getData():
     #Grab data from extracted files
-    lidar, targets, tvRv, numSamples = readExtractedData()
+    lidar, targets, tvRv, numSamples = extractMemory.readExtractedData()
     
     #Format data
     lTrain, lTest, tTrain, tTest, vTrain, vTest = dataFormat.format( \
@@ -73,5 +74,3 @@ def getData():
     return lTrain, lTest, tTrain, tTest, vTrain, vTest, numSamples
 
 
-
-scrapeData(True)
