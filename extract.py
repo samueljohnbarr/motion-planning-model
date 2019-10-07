@@ -74,5 +74,3 @@ def getData():
     return lTrain, lTest, tTrain, tTest, vTrain, vTest, numSamples
 
 
-
-scrapeData(True)

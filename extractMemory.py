@@ -32,7 +32,7 @@ def readFileData(fileName):
     f = open(fileName, "r")
     dataPoint = []
     for line in f:
-        if(line == sampleDelimeter):
+        if(line == sampleDelimiter):
             readList.append(dataPoint)
             dataPoint = []
         else:
