@@ -165,7 +165,7 @@ if (TRAIN):
         validation_data=([lidarTest, targetTest], labelTest), epochs=5, batch_size=numSamples)
     if VERBOSE: print('Training Completed.')
 
-#Evaluate Accuracy
+#Evaluate Accuracy - Print results
 metrics = model.evaluate([lidarTest, targetTest], labelTest)
 print(metrics)
 
