@@ -20,6 +20,7 @@ from tensorflow.keras.layers import concatenate
 from tensorflow.keras.layers import Lambda
 from tensorflow.keras.layers import Flatten
 from tensorflow.keras.layers import Reshape
+from tensorflow.keras.optimizers import Adam
 from tensorflow.keras.initializers import glorot_uniform
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import normalize
@@ -32,7 +33,7 @@ logger.setLevel(logging.ERROR)
 VERBOSE = False
 TRAIN = False
 
-#BATCH SIZE TODO
+#BATCH SIZE
 batch_size = 32
 
 
@@ -119,7 +120,7 @@ def resetModel():
         Exits program when completed
     """
     model = createModel()
-    model.compile(loss='mean_squared_error',optimizer=tf.keras.optimizers.Adam(0.1))
+    model.compile(loss='mean_squared_error',optimizer=Adam(0.1))
     initial_weights = model.get_weights()
     k_eval = lambda placeholder: placeholder.eval(session=K.get_session())
     new_weights = [k_eval(glorot_uniform()(w.shape)) for w in initial_weights]
@@ -128,10 +129,17 @@ def resetModel():
     exit(0)
 
 
+def initModel():
+    model = createModel()
+    model.compile(loss='mean_squared_error', optimizer=Adam(0.1), metrics=['accuracy'])
+
+    return model
+
+
 
 #++++++++++++++++++++++++++++++++EXECUTION POINT++++++++++++++++++++++++++++++++++++#
 print()
-#Process cmd line args
+Process cmd line args
 if len(sys.argv) > 1:
     for i in sys.argv:
         if (i == '-v'):
@@ -156,6 +164,8 @@ if VERBOSE: print('Compiling Model...')
 model.compile(loss='mean_squared_error', optimizer=tf.keras.optimizers.Adam(0.1), metrics=['accuracy'])
 
 if VERBOSE: print('Preparing Input Data...')
+# extract.py will read data in and preprocess it for the model
+## Preprocessing is done in dataFormat.py"
 lidarTrain, lidarTest, targetTrain, targetTest, labelTrain, labelTest, \
         numSamples = extract.getData()
 
